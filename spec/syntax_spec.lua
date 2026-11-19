@@ -41,4 +41,27 @@ describe('syntax', function()
       )
     )
   end)
+
+  it(
+    'highlights stop only as a tactic',
+    clean_buffer(
+      [[
+        theorem foo (start stop : Nat) : True := by
+          stop
+          trivial
+      ]],
+      function()
+        local win = Window:current()
+        win:set_cursor { 1, 19 }
+
+        local syn1 = vim.fn.synID(vim.fn.line '.', vim.fn.col '.', true)
+        assert.are_not.equal('leanSorry', vim.fn.synIDattr(syn1, 'name'))
+
+        win:set_cursor { 2, 2 }
+
+        local syn2 = vim.fn.synID(vim.fn.line '.', vim.fn.col '.', true)
+        assert.are.equal('leanSorry', vim.fn.synIDattr(syn2, 'name'))
+      end
+    )
+  )
 end)
